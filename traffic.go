@@ -28,18 +28,44 @@ func (*myScene) Setup(u engo.Updater) {
 	engo.Input.RegisterButton("AddCity", engo.KeyF1)
 	common.SetBackground(color.White)
 
+	var (
+		scrollSpeed float32 = 400
+		zoomSpeed   float32 = -0.125
+		edgeMargin  float32 = 20
+	)
+
+	keyboardScroller := common.NewKeyboardScroller(
+		scrollSpeed,
+		engo.DefaultHorizontalAxis,
+		engo.DefaultVerticalAxis,
+	)
+
+	edgeScroller := &common.EdgeScroller{
+		ScrollSpeed: scrollSpeed,
+		EdgeMargin:  edgeMargin,
+	}
+
+	mouseZoomer := &common.MouseZoomer{
+		ZoomSpeed: zoomSpeed,
+	}
+
 	world, _ := u.(*ecs.World)
 	world.AddSystem(&common.RenderSystem{})
 	world.AddSystem(&common.MouseSystem{})
+
+	world.AddSystem(keyboardScroller)
+	world.AddSystem(edgeScroller)
+	world.AddSystem(mouseZoomer)
 
 	world.AddSystem(&systems.CityBuildingSystem{})
 }
 
 func main() {
 	opts := engo.RunOptions{
-		Title:  "Hello World",
-		Width:  800,
-		Height: 600,
+		Title:          "Hello World",
+		Width:          800,
+		Height:         600,
+		StandardInputs: true,
 	}
 	engo.Run(opts, &myScene{})
 }
