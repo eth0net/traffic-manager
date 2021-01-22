@@ -93,10 +93,11 @@ type MouseTracker struct {
 // CityBuildingSystem handles the
 // creation of cities in the game.
 type CityBuildingSystem struct {
-	world        *ecs.World
-	mouseTracker MouseTracker
-	usedTiles    []int
-	elapsed      float32
+	world              *ecs.World
+	mouseTracker       MouseTracker
+	usedTiles          []int
+	elapsed, buildTime float32
+	built              int
 }
 
 // New is called to initialise the system when it is added to the scene.
@@ -138,6 +139,8 @@ func (cb *CityBuildingSystem) Update(dt float32) {
 	if cb.elapsed >= 10 {
 		cb.generateCity()
 		cb.elapsed = 0
+		cb.updateBuildTime()
+		cb.built++
 	}
 }
 
@@ -189,4 +192,27 @@ func (cb *CityBuildingSystem) isTileUsed(tile int) bool {
 		}
 	}
 	return false
+}
+
+func (cb *CityBuildingSystem) updateBuildTime() {
+	switch {
+	case cb.built < 2:
+		// 10 to 15 seconds
+		cb.buildTime = 5*rand.Float32() + 10
+	case cb.built < 5:
+		// 60 to 90 seconds
+		cb.buildTime = 30*rand.Float32() + 60
+	case cb.built < 10:
+		// 30 to 90 seconds
+		cb.buildTime = 60*rand.Float32() + 30
+	case cb.built < 20:
+		// 30 to 65 seconds
+		cb.buildTime = 35*rand.Float32() + 30
+	case cb.built < 25:
+		// 30 to 60 seconds
+		cb.buildTime = 30*rand.Float32() + 30
+	default:
+		// 20 to 40 seconds
+		cb.buildTime = 20*rand.Float32() + 20
+	}
 }
