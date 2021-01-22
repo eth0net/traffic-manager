@@ -18,6 +18,14 @@ type HUD struct {
 	common.SpaceComponent
 }
 
+// A Tile entity stores the contents
+// of a single tile of the game map.
+type Tile struct {
+	ecs.BasicEntity
+	common.RenderComponent
+	common.SpaceComponent
+}
+
 type myScene struct{}
 
 // Type identifies the scene type.
@@ -28,7 +36,7 @@ func (*myScene) Type() string {
 // Preload is called before loading assets,
 // allowing them to be registered / queued.
 func (*myScene) Preload() {
-	engo.Files.Load("textures/city.png")
+	engo.Files.Load("textures/city.png", "tilemap/TrafficMap.tmx")
 }
 
 // Setup is called before the main loop starts,
@@ -74,6 +82,28 @@ func (*myScene) Setup(u engo.Updater) {
 		hud.SpaceComponent.Position.Y = float32(resMsg.NewHeight) - hudHeight
 	})
 
+	resource, err := engo.Files.Resource("tilemap/TrafficMap.tmx")
+	if err != nil {
+		panic(err)
+	}
+	levelData := resource.(common.TMXResource).Level
+	common.CameraBounds = levelData.Bounds()
+
+	tiles := []*Tile{}
+	for _, tileLayer := range levelData.TileLayers {
+		for _, tileElement := range tileLayer.Tiles {
+			tile := &Tile{BasicEntity: ecs.NewBasic()}
+			tile.RenderComponent = common.RenderComponent{
+				Drawable: tileElement.Image,
+				Scale:    engo.Point{X: 1, Y: 1},
+			}
+			tile.SpaceComponent = common.SpaceComponent{
+				Position: tileElement.Point,
+			}
+			tiles = append(tiles, tile)
+		}
+	}
+
 	var (
 		scrollSpeed float32 = 400
 		zoomSpeed   float32 = -0.125
@@ -109,6 +139,9 @@ func (*myScene) Setup(u engo.Updater) {
 		switch sys := system.(type) {
 		case *common.RenderSystem:
 			sys.Add(&hud.BasicEntity, &hud.RenderComponent, &hud.SpaceComponent)
+			for _, tile := range tiles {
+				sys.Add(&tile.BasicEntity, &tile.RenderComponent, &tile.SpaceComponent)
+			}
 		}
 	}
 }
@@ -120,5 +153,6 @@ func main() {
 		Height:         600,
 		StandardInputs: true,
 	}
+
 	engo.Run(opts, &myScene{})
 }
