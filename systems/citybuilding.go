@@ -60,8 +60,6 @@ func (*CityBuildingSystem) Remove(ecs.BasicEntity) {}
 func (cb *CityBuildingSystem) Update(dt float32) {
 	// if the build city button has been pressed
 	if engo.Input.Button("AddCity").JustPressed() {
-		fmt.Println("F1 pressed")
-
 		// load in the city texture
 		texture, err := common.LoadedSprite("textures/city.png")
 		if err != nil {
