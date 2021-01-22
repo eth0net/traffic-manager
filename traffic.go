@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image/color"
 	"log"
 
 	"github.com/EngoEngine/ecs"
@@ -31,6 +32,8 @@ func (*myScene) Preload() {
 // Setup is called before the main loop starts,
 // allowing entities and systems to be added.
 func (*myScene) Setup(u engo.Updater) {
+	common.SetBackground(color.White)
+
 	cityTexture, err := common.LoadedSprite("textures/city.png")
 	if err != nil {
 		log.Println("Unable to load texture: " + err.Error())
