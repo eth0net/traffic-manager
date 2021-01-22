@@ -1,6 +1,10 @@
 package main
 
-import "github.com/EngoEngine/engo"
+import (
+	"github.com/EngoEngine/ecs"
+	"github.com/EngoEngine/engo"
+	"github.com/EngoEngine/engo/common"
+)
 
 type myScene struct{}
 
@@ -15,7 +19,10 @@ func (*myScene) Preload() {}
 
 // Setup is called before the main loop starts,
 // allowing entities and systems to be added.
-func (*myScene) Setup(engo.Updater) {}
+func (*myScene) Setup(u engo.Updater) {
+	world, _ := u.(*ecs.World)
+	world.AddSystem(&common.RenderSystem{})
+}
 
 func main() {
 	opts := engo.RunOptions{
