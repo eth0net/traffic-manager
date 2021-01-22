@@ -2,19 +2,12 @@ package main
 
 import (
 	"image/color"
-	"log"
 
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/common"
+	"github.com/raziel2244/traffic-manager/systems"
 )
-
-// A City entity within the game.
-type City struct {
-	ecs.BasicEntity
-	common.RenderComponent
-	common.SpaceComponent
-}
 
 type myScene struct{}
 
@@ -32,35 +25,14 @@ func (*myScene) Preload() {
 // Setup is called before the main loop starts,
 // allowing entities and systems to be added.
 func (*myScene) Setup(u engo.Updater) {
+	engo.Input.RegisterButton("AddCity", engo.KeyF1)
 	common.SetBackground(color.White)
-
-	cityTexture, err := common.LoadedSprite("textures/city.png")
-	if err != nil {
-		log.Println("Unable to load texture: " + err.Error())
-	}
-
-	city := City{
-		BasicEntity: ecs.NewBasic(),
-		RenderComponent: common.RenderComponent{
-			Scale:    engo.Point{X: 1, Y: 1},
-			Drawable: cityTexture,
-		},
-		SpaceComponent: common.SpaceComponent{
-			Position: engo.Point{X: 10, Y: 10},
-			Width:    303,
-			Height:   641,
-		},
-	}
 
 	world, _ := u.(*ecs.World)
 	world.AddSystem(&common.RenderSystem{})
+	world.AddSystem(&common.MouseSystem{})
 
-	for _, system := range world.Systems() {
-		switch sys := system.(type) {
-		case *common.RenderSystem:
-			sys.Add(&city.BasicEntity, &city.RenderComponent, &city.SpaceComponent)
-		}
-	}
+	world.AddSystem(&systems.CityBuildingSystem{})
 }
 
 func main() {
