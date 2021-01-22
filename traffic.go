@@ -36,7 +36,7 @@ func (*myScene) Type() string {
 // Preload is called before loading assets,
 // allowing them to be registered / queued.
 func (*myScene) Preload() {
-	engo.Files.Load("textures/city.png", "tilemap/TrafficMap.tmx")
+	engo.Files.Load("textures/city.png", "tilemap/TrafficMap.tmx", "textures/citySheet.png")
 }
 
 // Setup is called before the main loop starts,
@@ -71,7 +71,7 @@ func (*myScene) Setup(u engo.Updater) {
 		Height:   hudHeight,
 	}
 	hud.RenderComponent.SetShader(common.HUDShader)
-	hud.RenderComponent.SetZIndex(1)
+	hud.RenderComponent.SetZIndex(1000)
 
 	engo.Mailbox.Listen("WindowResizeMessage", func(msg engo.Message) {
 		resMsg, ok := msg.(engo.WindowResizeMessage)
