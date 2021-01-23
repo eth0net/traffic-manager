@@ -1,6 +1,7 @@
 package systems
 
 import (
+	"fmt"
 	"image/color"
 
 	"github.com/EngoEngine/ecs"
@@ -37,6 +38,20 @@ func (HUDTextMessage) Type() string {
 	return HUDTextMessageType
 }
 
+// HUDMoneyMessageType is the type for HUDMoneyMessage.
+const HUDMoneyMessageType string = "HUDMoneyMessage"
+
+// HUDMoneyMessage updates the HUD text
+// when changes occur with the player money.
+type HUDMoneyMessage struct {
+	Balance int
+}
+
+// Type implements the engo.Message interface.
+func (HUDMoneyMessage) Type() string {
+	return HUDMoneyMessageType
+}
+
 // HUDTextEntity is an entity for the HUDTextSystem.
 // Keeps track of text position, size and contents.
 type HUDTextEntity struct {
@@ -52,6 +67,9 @@ type HUDTextSystem struct {
 	text1, text2, text3, text4, money Text
 
 	entities []HUDTextEntity
+
+	balance int
+	updated bool
 }
 
 // New is called to initialise the system when it is
@@ -169,6 +187,15 @@ func (h *HUDTextSystem) New(w *ecs.World) {
 		}
 	})
 
+	engo.Mailbox.Listen(HUDMoneyMessageType, func(msg engo.Message) {
+		m, ok := msg.(HUDMoneyMessage)
+		if !ok {
+			return
+		}
+		h.balance = m.Balance
+		h.updated = true
+	})
+
 	engo.Mailbox.Listen("WindowResizeMessage", func(msg engo.Message) {
 		m, ok := msg.(engo.WindowResizeMessage)
 		if !ok {
@@ -205,6 +232,11 @@ func (h *HUDTextSystem) Update(dt float32) {
 		}
 	}
 
+	if h.updated {
+		text = h.money.Drawable.(common.Text)
+		text.Text = fmt.Sprintf("$%v", h.balance)
+		h.money.Drawable = text
+	}
 }
 
 // Add takes an entity and adds it to the system.

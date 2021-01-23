@@ -177,6 +177,8 @@ func (cb *CityBuildingSystem) generateCity() {
 		Line3:          "A town generates",
 		Line4:          "$100 per day",
 	})
+
+	engo.Mailbox.Dispatch(CityUpdateMessage{New: CityTypeNew})
 }
 
 func (cb *CityBuildingSystem) isTileUsed(tile int) bool {
@@ -192,13 +194,13 @@ func (cb *CityBuildingSystem) updateBuildTime() {
 	switch {
 	case cb.built < 2: // 10 to 15 seconds
 		cb.buildTime = 5*rand.Float32() + 10
-	case cb.built < 5: // 60 to 90 seconds
+	case cb.built < 8: // 60 to 90 seconds
 		cb.buildTime = 30*rand.Float32() + 60
-	case cb.built < 10: // 30 to 90 seconds
+	case cb.built < 18: // 30 to 90 seconds
 		cb.buildTime = 60*rand.Float32() + 30
-	case cb.built < 20: // 30 to 65 seconds
+	case cb.built < 28: // 30 to 65 seconds
 		cb.buildTime = 35*rand.Float32() + 30
-	case cb.built < 25: // 30 to 60 seconds
+	case cb.built < 33: // 30 to 60 seconds
 		cb.buildTime = 30*rand.Float32() + 30
 	default: // 20 to 40 seconds
 		cb.buildTime = 20*rand.Float32() + 20

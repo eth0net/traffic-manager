@@ -138,6 +138,7 @@ func (*myScene) Setup(u engo.Updater) {
 
 	world.AddSystem(&systems.CityBuildingSystem{})
 	world.AddSystem(&systems.HUDTextSystem{})
+	world.AddSystem(&systems.MoneySystem{})
 
 	for _, system := range world.Systems() {
 		switch sys := system.(type) {
