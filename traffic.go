@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"image"
 	"image/color"
 	"log"
@@ -9,6 +10,7 @@ import (
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/common"
 	"github.com/raziel2244/traffic-manager/systems"
+	"golang.org/x/image/font/gofont/gosmallcaps"
 )
 
 const (
@@ -44,6 +46,7 @@ func (*myScene) Type() string {
 // allowing them to be registered / queued.
 func (*myScene) Preload() {
 	engo.Files.Load("textures/citySheet.png", "tilemap/TrafficMap.tmx")
+	engo.Files.LoadReaderData("go.ttf", bytes.NewReader(gosmallcaps.TTF))
 }
 
 // Setup is called before the main loop starts,
@@ -134,6 +137,7 @@ func (*myScene) Setup(u engo.Updater) {
 	world.AddSystem(mouseZoomer)
 
 	world.AddSystem(&systems.CityBuildingSystem{})
+	world.AddSystem(&systems.HUDTextSystem{})
 
 	for _, system := range world.Systems() {
 		switch sys := system.(type) {

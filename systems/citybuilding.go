@@ -160,6 +160,23 @@ func (cb *CityBuildingSystem) generateCity() {
 			}
 		}
 	}
+
+	engo.Mailbox.Dispatch(HUDTextMessage{
+		BasicEntity: ecs.NewBasic(),
+		SpaceComponent: common.SpaceComponent{
+			Position: engo.Point{
+				X: float32((x + 1) * 64),
+				Y: float32((y + 1) * 64),
+			},
+			Width:  64,
+			Height: 64,
+		},
+		MouseComponent: common.MouseComponent{},
+		Line1:          "Town",
+		Line2:          "Just built!",
+		Line3:          "A town generates",
+		Line4:          "$100 per day",
+	})
 }
 
 func (cb *CityBuildingSystem) isTileUsed(tile int) bool {
