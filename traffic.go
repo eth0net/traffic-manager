@@ -3,6 +3,7 @@ package main
 import (
 	"image"
 	"image/color"
+	"log"
 
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
@@ -48,7 +49,6 @@ func (*myScene) Preload() {
 // Setup is called before the main loop starts,
 // allowing entities and systems to be added.
 func (*myScene) Setup(u engo.Updater) {
-	engo.Input.RegisterButton("AddCity", engo.KeyF1)
 	common.SetBackground(color.White)
 
 	var (
@@ -97,6 +97,9 @@ func (*myScene) Setup(u engo.Updater) {
 	tiles := []*Tile{}
 	for _, tileLayer := range levelData.TileLayers {
 		for _, tileElement := range tileLayer.Tiles {
+			if tileElement.Image == nil {
+				log.Printf("Tile is lacking image at point: %v", tileElement.Point)
+			}
 			tile := &Tile{BasicEntity: ecs.NewBasic()}
 			tile.RenderComponent = common.RenderComponent{
 				Drawable: tileElement.Image,

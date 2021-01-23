@@ -1,7 +1,6 @@
 package systems
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 // Spritesheet contains city sprites.
 var Spritesheet *common.Spritesheet
 
+// cities is a list of predefined city tile clusters.
 var cities = [...][12]int{
 	{
 		99, 100, 101,
@@ -83,18 +83,10 @@ type City struct {
 	common.SpaceComponent
 }
 
-// A MouseTracker entity to keep track of the
-// mouse position relative to the game grid.
-type MouseTracker struct {
-	ecs.BasicEntity
-	common.MouseComponent
-}
-
 // CityBuildingSystem handles the
 // creation of cities in the game.
 type CityBuildingSystem struct {
 	world              *ecs.World
-	mouseTracker       MouseTracker
 	usedTiles          []int
 	elapsed, buildTime float32
 	built              int
@@ -102,47 +94,32 @@ type CityBuildingSystem struct {
 
 // New is called to initialise the system when it is added to the world.
 func (cb *CityBuildingSystem) New(world *ecs.World) {
-	fmt.Println("CityBuildingSystem was added to the Scene")
+	cb.world = world
+
+	cb.updateBuildTime()
 
 	rand.Seed(time.Now().UnixNano())
 
-	// store world reference for later
-	cb.world = world
-
-	// load spritesheet
 	Spritesheet = common.NewSpritesheetWithBorderFromFile(
 		"textures/citySheet.png", 16, 16, 1, 1,
 	)
-
-	// prepare mouse tracker
-	mt := &cb.mouseTracker
-	mt.BasicEntity = ecs.NewBasic()
-	mt.MouseComponent = common.MouseComponent{Track: true}
-
-	// register the mouse tracker with relevant systems
-	for _, system := range world.Systems() {
-		switch sys := system.(type) {
-		case *common.MouseSystem:
-			sys.Add(&mt.BasicEntity, &mt.MouseComponent, nil, nil)
-		}
-	}
 }
-
-// Remove is called when an entity is removed from
-// the world to remove it from the system as well.
-func (*CityBuildingSystem) Remove(ecs.BasicEntity) {}
 
 // Update is called for every frame, with dt set
 // to the time in seconds since the last frame.
 func (cb *CityBuildingSystem) Update(dt float32) {
 	cb.elapsed += dt
-	if cb.elapsed >= 10 {
+	if cb.elapsed >= cb.buildTime {
 		cb.generateCity()
 		cb.elapsed = 0
 		cb.updateBuildTime()
 		cb.built++
 	}
 }
+
+// Remove is called when an entity is removed from
+// the world to remove it from the system as well.
+func (*CityBuildingSystem) Remove(ecs.BasicEntity) {}
 
 // generateCity generates a random city in a random map tile
 func (cb *CityBuildingSystem) generateCity() {
