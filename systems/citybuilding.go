@@ -100,7 +100,7 @@ type CityBuildingSystem struct {
 	built              int
 }
 
-// New is called to initialise the system when it is added to the scene.
+// New is called to initialise the system when it is added to the world.
 func (cb *CityBuildingSystem) New(world *ecs.World) {
 	fmt.Println("CityBuildingSystem was added to the Scene")
 
@@ -165,9 +165,9 @@ func (cb *CityBuildingSystem) generateCity() {
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 4; j++ {
 			tile := &City{BasicEntity: ecs.NewBasic()}
-			tile.RenderComponent.Drawable = Spritesheet.Cell(cities[city][i+3*j])
-			tile.RenderComponent.SetZIndex(1)
-			tile.SpaceComponent.Position = engo.Point{
+			tile.Drawable = Spritesheet.Cell(cities[city][i+3*j])
+			tile.SetZIndex(1)
+			tile.Position = engo.Point{
 				X: float32(((x+1)*64)+8) + float32(i*16),
 				Y: float32(((y + 1) * 64)) + float32(j*16),
 			}
@@ -196,23 +196,17 @@ func (cb *CityBuildingSystem) isTileUsed(tile int) bool {
 
 func (cb *CityBuildingSystem) updateBuildTime() {
 	switch {
-	case cb.built < 2:
-		// 10 to 15 seconds
+	case cb.built < 2: // 10 to 15 seconds
 		cb.buildTime = 5*rand.Float32() + 10
-	case cb.built < 5:
-		// 60 to 90 seconds
+	case cb.built < 5: // 60 to 90 seconds
 		cb.buildTime = 30*rand.Float32() + 60
-	case cb.built < 10:
-		// 30 to 90 seconds
+	case cb.built < 10: // 30 to 90 seconds
 		cb.buildTime = 60*rand.Float32() + 30
-	case cb.built < 20:
-		// 30 to 65 seconds
+	case cb.built < 20: // 30 to 65 seconds
 		cb.buildTime = 35*rand.Float32() + 30
-	case cb.built < 25:
-		// 30 to 60 seconds
+	case cb.built < 25: // 30 to 60 seconds
 		cb.buildTime = 30*rand.Float32() + 30
-	default:
-		// 20 to 40 seconds
+	default: // 20 to 40 seconds
 		cb.buildTime = 20*rand.Float32() + 20
 	}
 }

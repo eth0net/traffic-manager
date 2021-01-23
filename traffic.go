@@ -10,6 +10,12 @@ import (
 	"github.com/raziel2244/traffic-manager/systems"
 )
 
+const (
+	cameraScrollSpeed float32 = 400
+	cameraEdgeMargin  float32 = 20
+	cameraZoomSpeed   float32 = -0.125
+)
+
 // A HUD entity to display information on the
 // screen that is positioned with the camera.
 type HUD struct {
@@ -56,8 +62,7 @@ func (*myScene) Setup(u engo.Updater) {
 
 	hudImage := image.NewUniform(color.RGBA{205, 205, 205, 255})
 	hudNRGBA := common.ImageToNRGBA(hudImage, int(hudWidth), int(hudHeight))
-	hudImageObj := common.NewImageObject(hudNRGBA)
-	hudTexture := common.NewTextureSingle(hudImageObj)
+	hudTexture := common.NewTextureSingle(common.NewImageObject(hudNRGBA))
 
 	hud := HUD{BasicEntity: ecs.NewBasic()}
 	hud.RenderComponent = common.RenderComponent{
@@ -104,25 +109,19 @@ func (*myScene) Setup(u engo.Updater) {
 		}
 	}
 
-	var (
-		scrollSpeed float32 = 400
-		zoomSpeed   float32 = -0.125
-		edgeMargin  float32 = 20
-	)
-
 	keyboardScroller := common.NewKeyboardScroller(
-		scrollSpeed,
+		cameraScrollSpeed,
 		engo.DefaultHorizontalAxis,
 		engo.DefaultVerticalAxis,
 	)
 
 	edgeScroller := &common.EdgeScroller{
-		ScrollSpeed: scrollSpeed,
-		EdgeMargin:  edgeMargin,
+		ScrollSpeed: cameraScrollSpeed,
+		EdgeMargin:  cameraEdgeMargin,
 	}
 
 	mouseZoomer := &common.MouseZoomer{
-		ZoomSpeed: zoomSpeed,
+		ZoomSpeed: cameraZoomSpeed,
 	}
 
 	world, _ := u.(*ecs.World)
