@@ -93,8 +93,8 @@ type CityBuildingSystem struct {
 }
 
 // New is called to initialise the system when it is added to the world.
-func (cb *CityBuildingSystem) New(world *ecs.World) {
-	cb.world = world
+func (cb *CityBuildingSystem) New(w *ecs.World) {
+	cb.world = w
 
 	cb.updateBuildTime()
 
